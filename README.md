@@ -1,6 +1,6 @@
 # Fit & Flow Immersion
 
-Lovable Prompt — Fit & Flow Interactive Gym Website
+Fit & Flow Interactive Gym Website
 
 Build a highly immersive, full-screen interactive website called “Fit & Flow”, inspired by the visual experience and interaction model of the reference websites shown in the uploaded images.
 
@@ -1270,23 +1270,11 @@ Not:
 
 “A normal gym website.”
 
-This project was built with [Lovable](https://lovable.dev).
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/fdef6f70-deb4-44ba-86e6-8b3673a12587).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
 ## Development
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+Run locally using Node.js and npm:
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
 npm i
 npm run dev
 ```

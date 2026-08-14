@@ -6,14 +6,19 @@ function Pill({
   label,
   onClick,
   accent,
+  delay = 0,
 }: {
   icon: React.ReactNode;
   label: string;
   onClick?: () => void;
   accent?: string;
+  delay?: number;
 }) {
   return (
     <motion.button
+      initial={{ opacity: 0, y: -12, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.9, delay, ease: [0.16, 1, 0.3, 1] }}
       whileHover={{ y: -2 }}
       whileTap={{ scale: 0.97 }}
       onClick={onClick}
@@ -44,19 +49,21 @@ export function MusicControls({
           icon={<Music2 className="size-4" />}
           label="Spotify"
           accent="text-flow-live"
+          delay={0.24}
           onClick={() => onService("Spotify")}
         />
         <Pill
           icon={<PlayCircle className="size-4" />}
           label="YouTube Music"
           accent="text-flow-coral"
+          delay={0.34}
           onClick={() => onService("YouTube Music")}
         />
       </div>
       <div className="flex gap-2">
-        <Pill icon={<ListMusic className="size-4" />} label="Playlists" onClick={onPlaylists} />
-        <Pill icon={<Music4 className="size-4" />} label="Songs" onClick={onSongs} />
-        <Pill icon={<Download className="size-4" />} label="Install App" onClick={onInstall} />
+        <Pill icon={<ListMusic className="size-4" />} label="Playlists" delay={0.44} onClick={onPlaylists} />
+        <Pill icon={<Music4 className="size-4" />} label="Songs" delay={0.54} onClick={onSongs} />
+        <Pill icon={<Download className="size-4" />} label="Install App" delay={0.64} onClick={onInstall} />
       </div>
     </div>
   );

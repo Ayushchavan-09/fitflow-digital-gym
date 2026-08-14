@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 
-import gymBg from "@/assets/gym-bg.png.asset.json";
+import gymBg from "@/assets/gym-bg.png";
 import { LiveClock } from "@/components/LiveClock";
 import { OnlineCounter, useLiveMembers } from "@/components/OnlineCounter";
 import { MusicControls } from "@/components/MusicControls";
@@ -23,6 +23,8 @@ import {
 } from "@/components/OverlayPanels";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { modes } from "@/data/workouts";
+import { loadPlaylistTracks } from "@/lib/youtube";
+import { tracks as defaultTracks, type Track } from "@/data/music";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -55,14 +57,24 @@ type Overlay =
   | "info";
 
 function Index() {
-  const player = useAudioPlayer();
-  const members = useLiveMembers();
+  const [playlistTracks, setPlaylistTracks] = useState<Track[]>(defaultTracks);
   const [overlay, setOverlay] = useState<Overlay>(null);
   const [modeId, setModeId] = useState("strength");
   const [info, setInfo] = useState({ title: "", body: "" });
   const [deferred, setDeferred] = useState<{ prompt: () => void } | null>(null);
 
+  const player = useAudioPlayer(playlistTracks);
+  const members = useLiveMembers();
+
   const mode = useMemo(() => modes.find((m) => m.id === modeId) ?? modes[0]!, [modeId]);
+
+  useEffect(() => {
+    loadPlaylistTracks().then((fetched) => {
+      if (fetched && fetched.length > 0) {
+        setPlaylistTracks(fetched);
+      }
+    });
+  }, []);
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -94,20 +106,30 @@ function Index() {
       <div
         aria-hidden
         className="fixed inset-0 -z-10 bg-neutral-950 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${gymBg.url})` }}
+        style={{ backgroundImage: `url(${gymBg})` }}
       />
-      <img src={gymBg.url} alt="" className="sr-only" aria-hidden />
+      <img src={gymBg} alt="" className="sr-only" aria-hidden />
 
       <InteractiveGym onSelect={onHotspot} />
 
       {/* Top bar */}
       <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between gap-3 p-4 sm:p-8">
-        <div className="pointer-events-auto">
+        <motion.div
+          initial={{ opacity: 0, y: -16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 0.0, ease: [0.16, 1, 0.3, 1] }}
+          className="pointer-events-auto"
+        >
           <LiveClock />
-        </div>
-        <div className="pointer-events-auto hidden sm:block">
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: -16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+          className="pointer-events-auto absolute left-1/2 top-4 -translate-x-1/2 sm:top-8"
+        >
           <OnlineCounter count={members} />
-        </div>
+        </motion.div>
         <div className="pointer-events-auto">
           <MusicControls
             onPlaylists={() => setOverlay("playlists")}
@@ -124,19 +146,12 @@ function Index() {
       </div>
 
       {/* Center brand */}
-      <div className="absolute inset-0 z-10 flex items-center justify-center px-4">
+      <div className="absolute inset-x-0 top-16 bottom-32 z-10 flex flex-col items-center justify-center px-4">
         <BrandHero onJoin={() => setOverlay("membership")} />
       </div>
 
-      {/* Floating side panels (desktop) */}
-      <div className="pointer-events-none absolute left-6 top-1/2 z-20 hidden -translate-y-1/2 flex-col gap-3 xl:flex">
-        <WorkoutCard mode={mode} onModeChange={setModeId} onExpand={() => setOverlay("workout")} />
-        <CommunityCard active={members} />
-      </div>
-      <div className="pointer-events-none absolute right-6 top-1/2 z-20 hidden -translate-y-1/2 flex-col gap-3 xl:flex">
-        <ClassCard onBook={() => setOverlay("booking")} />
-        <ProgressCard />
-      </div>
+
+
 
       <div className="pointer-events-none absolute right-6 top-36 z-20 hidden lg:block xl:hidden">
         <Motivation />
@@ -166,16 +181,28 @@ function Index() {
       </div>
 
       {/* Player + footer */}
-      <div className="absolute inset-x-0 bottom-0 z-30 flex flex-col items-center gap-1.5 px-3 pb-4 sm:px-6 sm:pb-6">
+      <div className="absolute inset-x-0 bottom-0 z-30 flex flex-col items-center justify-center gap-1 px-3 pb-3 text-center sm:px-6 sm:pb-5">
         <MusicPlayer player={player} />
-        <p className="text-shadow-soft text-center text-[10px] text-white/55">
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.22, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+          className="w-full text-center text-[11px] font-semibold tracking-wide text-white drop-shadow-md sm:text-xs"
+        >
           Move. Train. Flow. Repeat. ❤️
-        </p>
-        <p className="text-shadow-soft text-center text-[10px] text-white/35">© 2026 Fit &amp; Flow</p>
+        </motion.p>
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.34, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+          className="w-full text-center text-[11px] font-semibold tracking-wide text-white drop-shadow-md sm:text-xs"
+        >
+          © 2026 AC . Fit &amp; Flow
+        </motion.p>
       </div>
 
-      <PlaylistPanel open={overlay === "playlists"} onClose={() => setOverlay(null)} player={player} />
-      <SongsPanel open={overlay === "songs"} onClose={() => setOverlay(null)} player={player} />
+      <PlaylistPanel open={overlay === "playlists"} onClose={() => setOverlay(null)} player={player} tracks={playlistTracks} />
+      <SongsPanel open={overlay === "songs"} onClose={() => setOverlay(null)} player={player} tracks={playlistTracks} />
       <MembershipPanel open={overlay === "membership"} onClose={() => setOverlay(null)} />
       <BookingPanel open={overlay === "booking"} onClose={() => setOverlay(null)} />
       <FullWorkoutPanel open={overlay === "workout"} onClose={() => setOverlay(null)} mode={mode} />

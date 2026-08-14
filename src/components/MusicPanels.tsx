@@ -2,22 +2,20 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Play } from "lucide-react";
 import { Panel } from "./Panel";
-import { formatTime, playlists, tracks } from "@/data/music";
+import { formatTime, playlists, tracks as defaultTracks, type Track } from "@/data/music";
 import type { AudioPlayer } from "@/hooks/useAudioPlayer";
 
 function TrackRow({
   n,
-  id,
+  track,
   onPlay,
   active,
 }: {
   n: number;
-  id: string;
+  track: Track;
   onPlay: (id: string) => void;
   active: boolean;
 }) {
-  const track = tracks.find((t) => t.id === id);
-  if (!track) return null;
   return (
     <motion.button
       whileHover={{ x: 4 }}
@@ -44,10 +42,12 @@ export function PlaylistPanel({
   open,
   onClose,
   player,
+  tracks = defaultTracks,
 }: {
   open: boolean;
   onClose: () => void;
   player: AudioPlayer;
+  tracks?: Track[];
 }) {
   const [selected, setSelected] = useState(playlists[0]!.id);
   const active = playlists.find((p) => p.id === selected)!;
@@ -74,15 +74,19 @@ export function PlaylistPanel({
           ))}
         </div>
         <div>
-          {active.trackIds.map((id, i) => (
-            <TrackRow
-              key={id + i}
-              n={i + 1}
-              id={id}
-              onPlay={player.playTrackId}
-              active={player.current.id === id}
-            />
-          ))}
+          {active.trackIds.map((id, i) => {
+            const track = tracks.find((t) => t.id === id) || tracks[i % tracks.length];
+            if (!track) return null;
+            return (
+              <TrackRow
+                key={track.id + i}
+                n={i + 1}
+                track={track}
+                onPlay={player.playTrackId}
+                active={player.current?.id === track.id}
+              />
+            );
+          })}
         </div>
       </div>
     </Panel>
@@ -93,20 +97,24 @@ export function SongsPanel({
   open,
   onClose,
   player,
+  tracks = defaultTracks,
 }: {
   open: boolean;
   onClose: () => void;
   player: AudioPlayer;
+  tracks?: Track[];
 }) {
+  const songList = tracks && tracks.length > 0 ? tracks : defaultTracks;
+
   return (
-    <Panel open={open} onClose={onClose} title="SONGS" subtitle={`${tracks.length} tracks in the library`}>
-      {tracks.map((t, i) => (
+    <Panel open={open} onClose={onClose} title="SONGS" subtitle={`${songList.length} tracks in the library`}>
+      {songList.map((t, i) => (
         <TrackRow
           key={t.id}
           n={i + 1}
-          id={t.id}
+          track={t}
           onPlay={player.playTrackId}
-          active={player.current.id === t.id}
+          active={player.current?.id === t.id}
         />
       ))}
     </Panel>
