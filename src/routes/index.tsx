@@ -197,7 +197,7 @@ function Index() {
           transition={{ delay: 1.34, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
           className="w-full text-center text-[11px] font-semibold tracking-wide text-white drop-shadow-md sm:text-xs"
         >
-          © 2026 AC . Fit &amp; Flow
+          © 2026 AC|TJ · Fit &amp; Flow
         </motion.p>
       </div>
 
